@@ -1,0 +1,27 @@
+# Name - name of the workflow. * workflows run asyncronously/in parallel
+name: test-cd-pipeline
+# On - the conditions under which the workflow runs. Usually push or pull-request.
+on:
+  push:
+    branches:
+    - main
+  # could use pull-request or other branches as well:
+  # pull-request:
+  #   branches:
+  #   - feature
+
+# Jobs - separate jobs in the same file. much like having separate yml files. They will be run asyncronously with no relation to the preceding/following jobs or environments. If you’re trying to limit the number of parallel ‘jobs’ then you you can set a limit of 1 for the workflow by setting max-parallel: 1 within the jobs.strategy element of the workflow YAML.
+
+jobs:
+  container-job:
+    runs-on: ubuntu-latest
+    # runs all of the steps inside the specified container rather than on the VM host.
+    # Because of this the network configuration changes from host based network to a container network
+    container:
+      image: node:10.16-jessie
+    # Services
+    services:
+      postgres:
+        image: postgres:10.8
+    # Steps - syncronous steps of the job workflow
+    steps:

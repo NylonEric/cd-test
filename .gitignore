@@ -1,2 +1,8 @@
-.env
+# file types:
 .txt
+
+# specific files
+.env
+packagelock.json
+
+# folders:
