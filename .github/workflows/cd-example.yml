@@ -13,15 +13,38 @@ on:
 # Jobs - separate jobs in the same file. much like having separate yml files. They will be run asyncronously with no relation to the preceding/following jobs or environments. If you’re trying to limit the number of parallel ‘jobs’ then you you can set a limit of 1 for the workflow by setting max-parallel: 1 within the jobs.strategy element of the workflow YAML.
 
 jobs:
-  container-job:
+  # container-job:
+  #   runs-on: ubuntu-latest
+  #   # runs all of the steps inside the specified container rather than on the VM host.
+  #   # Because of this the network configuration changes from host based network to a container network
+  #   container:
+  #     image: node:10.16-jessie
+  #   # Services
+  #   # services:
+  #   #   postgres:
+  #   #     image: postgres:10.8
+  #   # Steps - syncronous steps of the job workflow
+  #   steps:
+
+  deploy:
     runs-on: ubuntu-latest
-    # runs all of the steps inside the specified container rather than on the VM host.
-    # Because of this the network configuration changes from host based network to a container network
-    container:
-      image: node:10.16-jessie
-    # Services
-    services:
-      postgres:
-        image: postgres:10.8
-    # Steps - syncronous steps of the job workflow
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     steps:
+      - uses: actions/checkout@v2
+      - name: Install Python 3.9
+        working-directory: ./simple-server-example
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install EB CLI using pip
+        working-directory: ./simple-server-example
+        run: |
+          python -m pip install --upgrade pip
+          pip install awsebcli
+      - name: Deploy to Elastic Beanstalk
+        working-directory: ./simple-server-example
+        run: |
+          eb deploy

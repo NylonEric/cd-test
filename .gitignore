@@ -1,8 +1,11 @@
 # file types:
-.txt
+*.txt
+*.zip
 
 # specific files
 .env
 package-lock.json
+.DS_Store
 
 # folders:
+*/node_modules
