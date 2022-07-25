@@ -1,6 +1,14 @@
 # Name - name of the workflow. * workflows run asyncronously/in parallel
 name: test-cd-pipeline
 # On - the conditions under which the workflow runs. Usually push or pull-request.
+
+env:
+  APP_NAME: cd-test
+  S3_BUCKET: elasticbeanstalk-us-east-1-961713598984
+  AWS_REGION: us-east-1
+  AWS_PLATFORM: Docker
+  PIPELINE_ID: ${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
+
 on:
   push:
     branches:
@@ -26,22 +34,42 @@ jobs:
   #   # Steps - syncronous steps of the job workflow
   #   steps:
 
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Install Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install EB CLI using pip
-        run: |
-          python -m pip install --upgrade pip
-          pip install awsebcli
-      - name: Deploy to Elastic Beanstalk
-        run: |
-          eb deploy
+
+    - name: Checkout source code
+      uses: actions/checkout@v2
+
+    - name: Generate deployment package
+      run: zip -r deploy.zip . -x "*.git*" "*.env"
+
+    - name: Deploy to EB
+      uses: einaregilsson/beanstalk-deploy@v20
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        application_name: MyApplicationName
+        environment_name: MyApplication-Environment
+        version_label: ${{env.APP_NAME}}-${{env.PIPELINE_ID}}
+        region: ${{ secrets.AWS_DEFAULT_REGION }}
+        deployment_package: deploy.zip
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Install Python 3.9
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: 3.9
+  #     - name: Install EB CLI using pip
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install awsebcli
+  #     - name: Deploy to Elastic Beanstalk
+  #       run: |
+  #         eb deploy
