@@ -43,7 +43,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Generate deployment package
-      run: zip -r deploy.zip ./ -x "*.git*" "*.env"
+      run: zip -r ${{env.APP_NAME}}.zip ./ -x "*.git*" "*.env*"
 
     - name: Deploy to EB
       uses: einaregilsson/beanstalk-deploy@v20
@@ -54,7 +54,7 @@ jobs:
         environment_name: ${{ env.AWS_EB_ENV_NAME }}
         version_label: ${{ env.APP_NAME }}-${{ env.PIPELINE_ID }}
         region: ${{ secrets.AWS_DEFAULT_REGION }}
-        deployment_package: deploy.zip
+        deployment_package: ${{env.APP_NAME}}.zip
 
   # deploy:
   #   runs-on: ubuntu-latest
