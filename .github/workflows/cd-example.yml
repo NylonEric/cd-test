@@ -54,6 +54,7 @@ jobs:
         version_label: ${{env.APP_NAME}}-${{env.PIPELINE_ID}}
         region: ${{ secrets.AWS_DEFAULT_REGION }}
         deployment_package: deploy.zip
+        
   # deploy:
   #   runs-on: ubuntu-latest
   #   env:
