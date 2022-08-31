@@ -5,7 +5,7 @@ name: test-cd-pipeline
 env:
   APP_NAME: cd-test
   AWS_EB_ENV_NAME: Cdtest-env
-  S3_BUCKET: ${{ AWS_S3_BUCKET }}
+  S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   # AWS_REGION: us-east-1 # determined from eb environment variables
   AWS_PLATFORM: Docker
   PIPELINE_ID: ${{ github.run_id }}-${{ github.run_number }}
