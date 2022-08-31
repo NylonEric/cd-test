@@ -55,3 +55,4 @@ jobs:
         version_label: ${{ env.APP_NAME }}-${{ env.PIPELINE_ID }}
         region: ${{ secrets.AWS_DEFAULT_REGION }}
         deployment_package: ${{env.APP_NAME}}.zip
+        use_existing_version_if_available: true
